@@ -504,6 +504,12 @@ kbd {
 .records tr.latest td { color: var(--honey); }
 .records td.ver { color: var(--muted); font-size: 11.5px; }
 .records-wrap { overflow-x: auto; }
+#view-records { display: flex; flex-direction: column; gap: 14px; }
+.lb-box { padding: 18px; }
+.lb-box h3 { font-size: 15px; }
+.records-box { padding: 10px 14px; opacity: 0.85; }
+.records-box h3 { margin-bottom: 6px; }
+.records-box .records-wrap { font-size: 12px; }
 
 /* language menu */
 .sheet.narrow { max-width: 440px; }
@@ -625,16 +631,22 @@ kbd {
     </div>
     <div class="hview" data-view="records" id="view-records" role="tabpanel" hidden>
       <h2 data-i18n="records">紀錄</h2>
-      <div class="records-wrap" id="records"></div>
-      <h3 style="margin-top:18px">🌐 Global Leaderboard <small style="font-weight:400;opacity:.7">(Hive-verified scores)</small></h3>
-      <div class="lb-periods" role="tablist" style="display:flex;gap:6px;margin:6px 0">
-        <button type="button" class="ghost-btn lb-period-btn" data-period="daily">Daily</button>
-        <button type="button" class="ghost-btn lb-period-btn" data-period="weekly">Weekly</button>
-        <button type="button" class="ghost-btn lb-period-btn" data-period="alltime">All-time</button>
+      <div class="box lb-box">
+        <h3 style="margin-top:0">🌐 Global Leaderboard <small style="font-weight:400;opacity:.7">(Hive-verified scores)</small></h3>
+        <div class="lb-periods" role="tablist" style="display:flex;gap:6px;margin:6px 0">
+          <button type="button" class="ghost-btn lb-period-btn" data-period="daily">Daily</button>
+          <button type="button" class="ghost-btn lb-period-btn" data-period="weekly">Weekly</button>
+          <button type="button" class="ghost-btn lb-period-btn" data-period="alltime">All-time</button>
+        </div>
+        <p class="note" id="lbMyRank" style="min-height:1.2em"></p>
+        <ol id="globalLeaderboard" class="records-wrap"><li style="opacity:.6">Loading…</li></ol>
+        <button type="button" class="ghost-btn" id="lbMoreBtn" style="margin-top:6px" hidden>Show more</button>
       </div>
-      <p class="note" id="lbMyRank" style="min-height:1.2em"></p>
-      <ol id="globalLeaderboard" class="records-wrap"><li style="opacity:.6">Loading…</li></ol>
-      <button type="button" class="ghost-btn" id="lbMoreBtn" style="margin-top:6px" hidden>Show more</button>
+      <div class="box records-box">
+        <h3 style="margin-top:0;font-size:12px;opacity:.75">📱 Your records on this device</h3>
+        <div class="records-wrap" id="records"></div>
+        <button type="button" class="ghost-btn" id="shareBestBtn" style="margin-top:8px" hidden>📣 Share my best</button>
+      </div>
     </div>
     <div class="hview" data-view="info" id="view-info" role="tabpanel" hidden>
       <h2 data-i18n="infoT">版本與更新</h2>
@@ -1635,9 +1647,27 @@ function gameOver() {
     <p class="disclaimer" style="margin-bottom:14px">${t('disclaimer')}</p>
     ${record ? `<p class="record">${t('record')}</p>` : `<p class="best">${t('best')} <b>${fmt3(best)}</b></p><p></p>`}
     ${(window.HBPAuth && window.HBPAuth.current() && window.HBPAuth.current().verified) ? `<button class="secondary" data-act="postscore" type="button" data-total="${total}" data-lines="${g.lines}" data-hf="${g.hfMax}" data-seconds="${Math.round(g.t / 1000)}" data-seed="${g.seed}">Post score on-chain (@${window.HBPAuth.current().username})</button>` : ''}
+    <button class="secondary" data-act="share" type="button" data-total="${total}" data-lines="${g.lines}" data-hf="${g.hfMax}">📣 Share result</button>
     <div class="actions"><button class="primary" data-act="start" type="button">${t('againBtn')}</button>
     <button class="secondary" data-act="home" type="button">${t('homeBtn')}</button>${langMenuBtn()}</div>
     <p class="ver-note">BeeTris v${VERSION.version} · 🐝 <a href="https://vote.hive.uno/@hive3" target="_blank" rel="noopener" style="color:inherit">Vote the real @hive3 witness</a></p>`); }, 700);
+}
+function shareScore(total, lines, hf, btn) {
+  const text = `I just scored ${fmt3(total)} on BeeTris 🐝🧱 — ${lines} lines cleared, HF${hf}. Can you beat me?\nhttps://hiveb3.github.io/hive-block-producer/`;
+  const copy = navigator.clipboard && navigator.clipboard.writeText
+    ? navigator.clipboard.writeText(text).then(() => true).catch(() => false)
+    : Promise.resolve(false);
+  copy.then(ok => {
+    const wrap = document.createElement('div');
+    wrap.className = 'note';
+    wrap.style.marginTop = '6px';
+    wrap.innerHTML = (ok ? '✅ Copied! ' : '⚠️ Could not auto-copy — select the text below. ') +
+      `Paste it on <a href="https://ecency.com/waves" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Ecency Waves</a> or <a href="https://peakd.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">PeakD</a>.` +
+      (ok ? '' : `<br><textarea readonly style="width:100%;margin-top:6px;background:var(--bg-deep);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px" rows="3">${text}</textarea>`);
+    if (btn.nextElementSibling && btn.nextElementSibling.classList.contains('share-note')) btn.nextElementSibling.remove();
+    wrap.classList.add('share-note');
+    btn.insertAdjacentElement('afterend', wrap);
+  });
 }
 function showSheet(fn, cls = '') {
   sheetFn = fn;
@@ -1662,6 +1692,7 @@ el.sheet.addEventListener('click', e => {
     showHome();
     document.querySelector('.home-tabs button[data-view="records"]')?.click();
   }
+  if (act === 'share') { shareScore(Number(b.dataset.total), Number(b.dataset.lines), Number(b.dataset.hf), b); return; }
   if (act === 'postscore') {
     if (!confirm('This will broadcast your score on the Hive blockchain (uses Resource Credits, not HIVE). Chain data is public and permanent. Continue?')) return;
     const stats = { total: Number(b.dataset.total), lines: Number(b.dataset.lines), hf: Number(b.dataset.hf), seconds: Number(b.dataset.seconds), seed: Number(b.dataset.seed) };
@@ -1709,13 +1740,21 @@ function renderHome() {
     <span><kbd>↓</kbd> ${t('kmSoft')}</span><span><kbd>${t('space')}</kbd> ${t('kmHard')}</span><span><kbd>C</kbd> ${t('kmHold')}</span>
     <span><kbd>B</kbd> ${t('kmBee')}</span><span><kbd>P</kbd> ${t('kmPause')}</span><span><kbd>N</kbd> ${t('kMusic')}</span><span><kbd>L</kbd> ${t('kLang')}</span>`;
   const runs = loadRuns();
-  if (!runs.length) $('#records').innerHTML = `<p class="note">${t('noRecords')}</p>`;
-  else {
+  const shareBtn = $('#shareBestBtn');
+  if (!runs.length) {
+    $('#records').innerHTML = `<p class="note">${t('noRecords')}</p>`;
+    if (shareBtn) shareBtn.hidden = true;
+  } else {
     let df;
     try { df = new Intl.DateTimeFormat(lang, { month: 'short', day: 'numeric' }); } catch (e) { df = null; }
     $('#records').innerHTML = `<table class="records"><thead><tr><th>${t('colName')}</th><th class="n">${t('colScore')}</th><th class="n">${t('colLines')}</th><th class="n">${t('colHf')}</th><th class="n">${t('colDate')}</th><th class="n">${t('colVer')}</th></tr></thead><tbody>${
       runs.map(r => `<tr class="${r.id === lastRunId ? 'latest' : ''}"><td class="who">${escapeHtml(r.n || t('defaultName'))}</td><td class="n">${fmt3(r.t)}</td><td class="n">${r.l}</td><td class="n">${r.h}</td><td class="n">${df ? df.format(new Date(r.d)) : ''}</td><td class="n ver">${r.v ? escapeHtml(r.v) : '—'}</td></tr>`).join('')
     }</tbody></table>`;
+    if (shareBtn) {
+      const best = runs.reduce((a, b) => (b.t > a.t ? b : a), runs[0]);
+      shareBtn.hidden = false;
+      shareBtn.onclick = () => shareScore(best.t, best.l, best.h, shareBtn);
+    }
   }
   paintIconsIn($('#homeRules'));
   drawHero();
