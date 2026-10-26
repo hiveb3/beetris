@@ -4,6 +4,14 @@
    Versioning: vMAJOR.MINOR.PATCH. New features bump MINOR, bug fixes bump PATCH; v1.0.0 marks the end of beta. */
 window.HBP_RELEASES = [
   {
+    version: '0.11.1',
+    date: '2026-10-26',
+    notes: [
+      'Rotation kicks now also try moving the piece down a row, fixing cases where a rotate felt completely dead once the stack got tall and cluttered at high speed.',
+      'When a rotation truly has no room (every kick position is blocked), you now hear a clear error sound instead of silence, so it reads as "blocked" rather than "broken".',
+    ],
+  },
+  {
     version: '0.11.0',
     date: '2026-10-20',
     notes: [

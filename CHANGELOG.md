@@ -5,6 +5,11 @@ Versions follow vMAJOR.MINOR.PATCH: new features bump MINOR, bug fixes bump PATC
 
 <!-- Generated from version.js by scripts/changelog.js. Edit version.js, not this file. -->
 
+## v0.11.1 (2026-10-26)
+
+- Rotation kicks now also try moving the piece down a row, fixing cases where a rotate felt completely dead once the stack got tall and cluttered at high speed.
+- When a rotation truly has no room (every kick position is blocked), you now hear a clear error sound instead of silence, so it reads as "blocked" rather than "broken".
+
 ## v0.11.0 (2026-10-20)
 
 - Phone controls redesigned as one symmetric deck: two thumb clusters of the same size, set in from the edges.

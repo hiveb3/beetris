@@ -1108,10 +1108,14 @@ function rotate(dir) {
   const p = S.cur;
   if (!p || S.clearing || p.type === 'O' || p.m.length === 1) return;
   const nm = rotateM(p.m, dir);
-  const kicks = [[0, 0], [-1, 0], [1, 0], [-2, 0], [2, 0], [0, -1], [-1, -1], [1, -1]];
+  const kicks = [[0, 0], [-1, 0], [1, 0], [-2, 0], [2, 0], [0, -1], [-1, -1], [1, -1], [0, 1], [-1, 1], [1, 1]];
   for (const [kx, ky] of kicks) {
     if (!collides(p, kx, ky, nm)) { p.m = nm; p.x += kx; p.y += ky; touchLock(); sfx('rotate'); return; }
   }
+  // No kick fit: rotation is legitimately blocked (no room), not broken.
+  // Give audible feedback instead of silently doing nothing, so it doesn't
+  // read as unresponsive controls when the stack is tall/cluttered.
+  sfx('err');
 }
 function beeTarget(p) {
   for (let y = ROWS - 1; y >= 0; y--) if (!S.board[y][p.x]) return y;
