@@ -96,7 +96,17 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--honey); outline
   padding-inline: 16px;
   align-content: start;
 }
-.panel { display: flex; flex-direction: column; gap: 12px; min-width: 0; max-height: var(--bh, none); overflow: hidden; }
+.panel {
+  display: flex; flex-direction: column; gap: 12px; min-width: 0; max-height: var(--bh, none);
+  overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--line) transparent;
+}
+/* Safety net for wide/short desktop viewports (e.g. 1920x1080) where this column's own
+   content — stat boxes plus the mute/music/pause/lang row — can be taller than the board's
+   height. Previously this was `overflow: hidden`, which silently clipped the bottom controls
+   with no way to reach them. Scrolling keeps the "whole game fits one screen" layout while
+   making any such overflow recoverable instead of invisible. */
+.panel::-webkit-scrollbar { width: 6px; }
+.panel::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
 .panel .help, .panel .feed { flex: 1 1 auto; min-height: 0; overflow: hidden; }
 .box {
   background: var(--panel);
