@@ -1,0 +1,10 @@
+# Internal hive3 ops/moderation tooling -- not part of the public game, keep out of this repo
+/post-queue-replies.js
+/post-queue-state.json
+/flag-phishing.js
+/flag-phishing-state.json
+/periodic-phishing-watch.js
+/flag-scam-stefany0720.js
+/phishing-untouched.json
+/final_queue.json
+/approved-targets.json
