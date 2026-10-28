@@ -2420,7 +2420,9 @@ requestAnimationFrame(frame);
     // entries here is always the full accumulated list from rank 1 (loadGlobalLeaderboard concatenates
     // every page into lbEntries before calling this) — so position i is always absolute rank i+1,
     // regardless of which page was most recently fetched. Do not offset by lbOffset here.
-    const fmtWhen = iso => { try { return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }); } catch (e) { return ''; } };
+    // explicit UTC (not the viewer's local timezone) so times are unambiguous and directly
+    // comparable between players regardless of where they're playing from
+    const fmtWhen = iso => { try { return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' }) + ' UTC'; } catch (e) { return ''; } };
     el2.innerHTML = entries.length
       ? entries.map((e, i) => `<li>#${i + 1} <b>@${e.username}</b> — ${e.score.toFixed(3)} <small style="opacity:.6">${fmtWhen(e.at)}</small></li>`).join('')
       : (lbOffset === 0 ? '<li style="opacity:.6">No verified scores yet — be the first!</li>' : '<li style="opacity:.6">No more entries.</li>');
