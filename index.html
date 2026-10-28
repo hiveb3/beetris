@@ -261,6 +261,7 @@ kbd {
 }
 .ghost-btn:hover { color: var(--fg); border-color: var(--muted); }
 .lb-period-btn.active { color: var(--accent, #f0b429); border-color: var(--accent, #f0b429); }
+.support-amt.active { color: var(--accent, #f0b429); border-color: var(--accent, #f0b429); }
 
 /* touch controls: utility pills on top, then a deck with two mirrored thumb clusters of the same size.
    Left hand moves and drops, right hand rotates. Every key keeps a hit area of at least 44x44 px. */
@@ -662,6 +663,18 @@ kbd {
       <h2 data-i18n="infoT">版本與更新</h2>
       <p class="note"><span data-i18n="beta"></span> <a class="feedback-link" href="https://github.com/hiveb3/hive-block-producer/issues/new" target="_blank" rel="noopener" data-i18n="feedback"></a></p>
       <p class="note" id="privacyNote" data-i18n="privacy" hidden></p>
+      <div class="box support-box" style="margin:14px 0">
+        <h3 style="margin-top:0;font-size:13px">💝 Support the developer</h3>
+        <p class="note" style="font-size:12px;opacity:.85">This is a real, voluntary HIVE donation to support development — separate from the in-game play-money HIVE/HBD shown during a run, which have no real value.</p>
+        <div class="support-amounts" style="display:flex;gap:6px;margin:8px 0;flex-wrap:wrap">
+          <button type="button" class="ghost-btn support-amt" data-amt="1">1 HIVE</button>
+          <button type="button" class="ghost-btn support-amt" data-amt="5">5 HIVE</button>
+          <button type="button" class="ghost-btn support-amt" data-amt="10">10 HIVE</button>
+        </div>
+        <input type="number" id="supportCustomAmt" min="0.001" step="0.001" placeholder="Custom amount" style="width:100%;margin-bottom:8px;box-sizing:border-box" />
+        <button type="button" class="primary" id="supportSendBtn" style="width:100%">Send with Keychain</button>
+        <p class="note" id="supportStatus" style="font-size:12px;min-height:1.2em"></p>
+      </div>
       <div class="pager"><div class="changelog cols" id="changelog" lang="en"></div></div>
       <p class="pager-hint" data-i18n="moreHint" hidden></p>
     </div>
@@ -2443,6 +2456,58 @@ requestAnimationFrame(frame);
   const lbMoreBtn = $('#lbMoreBtn');
   if (lbMoreBtn) lbMoreBtn.addEventListener('click', () => { lbOffset += LB_PAGE_SIZE; loadGlobalLeaderboard(false); });
   document.querySelectorAll('.home-tabs button[data-view="records"]').forEach(b => b.addEventListener('click', () => loadGlobalLeaderboard(true)));
+
+  // Support the developer: a real, voluntary HIVE transfer via Keychain, entirely separate
+  // from the in-game play-money HIVE/HBD. Never requires login — any Keychain user can send.
+  (function initSupportTip() {
+    const amtButtons = document.querySelectorAll('.support-amt');
+    const customInput = $('#supportCustomAmt');
+    const sendBtn = $('#supportSendBtn');
+    const statusEl = $('#supportStatus');
+    let selectedAmt = null;
+
+    amtButtons.forEach(b => {
+      b.addEventListener('click', () => {
+        amtButtons.forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        selectedAmt = b.dataset.amt;
+        if (customInput) customInput.value = '';
+      });
+    });
+    if (customInput) {
+      customInput.addEventListener('input', () => {
+        if (customInput.value) { amtButtons.forEach(x => x.classList.remove('active')); selectedAmt = null; }
+      });
+    }
+
+    if (sendBtn) {
+      sendBtn.addEventListener('click', () => {
+        const raw = (customInput && customInput.value) ? customInput.value : selectedAmt;
+        const amount = Number(raw);
+        if (!raw || !isFinite(amount) || amount <= 0) {
+          statusEl.textContent = 'Pick an amount or enter a custom one first.';
+          return;
+        }
+        if (!window.hive_keychain) {
+          statusEl.textContent = 'Hive Keychain extension not found — install it to send a tip.';
+          return;
+        }
+        const session = window.HBPAuth && window.HBPAuth.current();
+        const fromPrompt = session ? session.username : (window.prompt('Your Hive username:') || '').trim().toLowerCase();
+        if (!fromPrompt) return;
+        sendBtn.disabled = true; statusEl.textContent = 'Opening Keychain…';
+        const amountStr = amount.toFixed(3) + ' HIVE';
+        window.hive_keychain.requestTransfer(fromPrompt, 'hive3', amountStr, 'BeeTris support — thank you! 🐝', 'HIVE', res => {
+          sendBtn.disabled = false;
+          if (res && res.success) {
+            statusEl.textContent = 'Thank you so much — tip sent! 🐝💛';
+          } else {
+            statusEl.textContent = 'Not sent: ' + ((res && (res.error || res.message)) || 'cancelled');
+          }
+        }, true);
+      });
+    }
+  })();
 })();
 </script>
 </body>
