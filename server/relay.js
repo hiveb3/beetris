@@ -43,19 +43,26 @@ function createServer({ allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://d
       if (!/^[a-z][a-z0-9.-]{2,15}$/.test(username)) return json(res, 400, { error: 'invalid-name' });
       const challenge = `hive-block-producer login\naccount: ${username}\ntime: ${new Date().toISOString()}\nnonce: ${crypto.randomBytes(12).toString('hex')}`;
       challenges.set(challenge, { username, expires: Date.now() + LIMITS.challengeMs });
+      console.log(`[auth/challenge] user=${username || '(empty)'}`);
       return json(res, 200, { challenge });
     }
     if (req.method === 'POST' && url.pathname === '/auth/verify') {
-      let body; try { body = await readBody(req); } catch (e) { return json(res, 400, { error: 'bad-body' }); }
+      let body; try { body = await readBody(req); } catch (e) { console.log('[auth/verify] fail reason=bad-body'); return json(res, 400, { error: 'bad-body' }); }
+      const reqUser = String(body.username || '').toLowerCase();
       const c = challenges.get(body.challenge);
       challenges.delete(body.challenge); // one use only
-      if (!c || c.expires < Date.now() || c.username !== String(body.username || '').toLowerCase()) return json(res, 401, { ok: false, reason: 'challenge' });
+      if (!c || c.expires < Date.now() || c.username !== reqUser) {
+        const why = !c ? 'unknown-or-reused' : c.expires < Date.now() ? 'expired' : 'username-mismatch';
+        console.log(`[auth/verify] fail reason=challenge (${why}) user=${reqUser || '(empty)'}`);
+        return json(res, 401, { ok: false, reason: 'challenge' });
+      }
       // hiveClient ?? undefined: lets verifyLogin's own default parameter build a fresh client (picking up
       // the latest nodes.json) when no override was passed, since `null` alone wouldn't trigger a JS default param.
       const v = await verifyLogin({ username: c.username, challenge: body.challenge, signature: body.signature }, hiveClient ?? undefined).catch(() => ({ ok: false, reason: 'node-error' }));
-      if (!v.ok) return json(res, 401, v);
+      if (!v.ok) { console.log(`[auth/verify] fail reason=${v.reason || 'unknown'} user=${c.username}`); return json(res, 401, v); }
       const token = crypto.randomBytes(24).toString('hex');
       sessions.set(token, { username: c.username, expires: Date.now() + LIMITS.sessionMs });
+      console.log(`[auth/verify] ok user=${c.username}`);
       return json(res, 200, { ok: true, token, username: c.username });
     }
     if (req.method === 'GET' && url.pathname === '/leaderboard') {
