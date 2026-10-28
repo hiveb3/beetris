@@ -1669,7 +1669,9 @@ function gameOver() {
     </dl>
     <p class="disclaimer" style="margin-bottom:14px">${t('disclaimer')}</p>
     ${record ? `<p class="record">${t('record')}</p>` : `<p class="best">${t('best')} <b>${fmt3(best)}</b></p><p></p>`}
-    ${(window.HBPAuth && window.HBPAuth.current() && window.HBPAuth.current().verified) ? `<button class="secondary" data-act="postscore" type="button" data-total="${total}" data-lines="${g.lines}" data-hf="${g.hfMax}" data-seconds="${Math.round(g.t / 1000)}" data-seed="${g.seed}">Post score on-chain (@${window.HBPAuth.current().username})</button>` : ''}
+    ${(window.HBPAuth && window.HBPAuth.current() && window.HBPAuth.current().verified)
+      ? `<button class="secondary" data-act="postscore" type="button" data-total="${total}" data-lines="${g.lines}" data-hf="${g.hfMax}" data-seconds="${Math.round(g.t / 1000)}" data-seed="${g.seed}">Post score on-chain (@${window.HBPAuth.current().username})</button>`
+      : `<button class="secondary" data-act="loginpost" type="button" data-total="${total}" data-lines="${g.lines}" data-hf="${g.hfMax}" data-seconds="${Math.round(g.t / 1000)}" data-seed="${g.seed}">Log in with Hive to post this score</button>`}
     <button class="secondary" data-act="share" type="button" data-total="${total}" data-lines="${g.lines}" data-hf="${g.hfMax}">📣 Share result</button>
     <div class="actions"><button class="primary" data-act="start" type="button">${t('againBtn')}</button>
     <button class="secondary" data-act="home" type="button">${t('homeBtn')}</button>${langMenuBtn()}</div>
@@ -1701,6 +1703,30 @@ function showSheet(fn, cls = '') {
   const btn = el.sheet.querySelector('.primary');
   if (btn) btn.focus({ preventScroll: true });
 }
+function broadcastScore(stats, btn) {
+  btn.disabled = true; btn.textContent = 'Broadcasting…';
+  window.HBPAuth.postScore(stats)
+    .then(r => {
+      btn.textContent = 'Posted on-chain ✓';
+      // also register on the shared public leaderboard — the server independently re-verifies this
+      // transaction on chain before trusting it, so this call is just "hey, go check tx X" not a claim
+      const username = window.HBPAuth.current().username;
+      const score = Number((stats.total / 1000).toFixed(3)); // must match net/hive-auth.js postScore()'s own rounding
+      fetch(`${window.HBP_RELAY_HTTP || ''}/leaderboard/submit`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, txId: r.txId, score }),
+      }).catch(() => { /* leaderboard registration is best-effort; the on-chain post itself already succeeded */ });
+      // offer a quick way to see where that score landed, right when the player cares most about it
+      if (!btn.nextElementSibling || btn.nextElementSibling.dataset.act !== 'viewleaderboard') {
+        const viewBtn = document.createElement('button');
+        viewBtn.type = 'button'; viewBtn.className = 'secondary'; viewBtn.dataset.act = 'viewleaderboard';
+        viewBtn.textContent = 'View leaderboard';
+        viewBtn.style.marginTop = '8px';
+        btn.insertAdjacentElement('afterend', viewBtn);
+      }
+    })
+    .catch(e => { btn.textContent = 'Failed: ' + e.message; btn.disabled = false; });
+}
 el.sheet.addEventListener('click', e => {
   const b = e.target.closest('button[data-act]');
   if (!b) return;
@@ -1719,28 +1745,23 @@ el.sheet.addEventListener('click', e => {
   if (act === 'postscore') {
     if (!confirm('This will broadcast your score on the Hive blockchain (uses Resource Credits, not HIVE). Chain data is public and permanent. Continue?')) return;
     const stats = { total: Number(b.dataset.total), lines: Number(b.dataset.lines), hf: Number(b.dataset.hf), seconds: Number(b.dataset.seconds), seed: Number(b.dataset.seed) };
-    b.disabled = true; b.textContent = 'Broadcasting…';
-    window.HBPAuth.postScore(stats)
-      .then(r => {
-        b.textContent = 'Posted on-chain ✓';
-        // also register on the shared public leaderboard — the server independently re-verifies this
-        // transaction on chain before trusting it, so this call is just "hey, go check tx X" not a claim
-        const username = window.HBPAuth.current().username;
-        const score = Number((stats.total / 1000).toFixed(3)); // must match net/hive-auth.js postScore()'s own rounding
-        fetch(`${window.HBP_RELAY_HTTP || ''}/leaderboard/submit`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, txId: r.txId, score }),
-        }).catch(() => { /* leaderboard registration is best-effort; the on-chain post itself already succeeded */ });
-        // offer a quick way to see where that score landed, right when the player cares most about it
-        if (!b.nextElementSibling || b.nextElementSibling.dataset.act !== 'viewleaderboard') {
-          const viewBtn = document.createElement('button');
-          viewBtn.type = 'button'; viewBtn.className = 'secondary'; viewBtn.dataset.act = 'viewleaderboard';
-          viewBtn.textContent = 'View leaderboard';
-          viewBtn.style.marginTop = '8px';
-          b.insertAdjacentElement('afterend', viewBtn);
+    broadcastScore(stats, b);
+  }
+  if (act === 'loginpost') {
+    if (!window.HBPAuth || !window.HBPAuth.hasKeychain()) { alert('Hive Keychain extension not found. Install it to log in and post your score on-chain.'); return; }
+    const name = prompt('Hive username:');
+    if (!name) return;
+    const stats = { total: Number(b.dataset.total), lines: Number(b.dataset.lines), hf: Number(b.dataset.hf), seconds: Number(b.dataset.seconds), seed: Number(b.dataset.seed) };
+    const original = b.textContent;
+    b.disabled = true; b.textContent = 'Signing in…';
+    window.HBPAuth.login(name, { server: window.HBP_RELAY_HTTP })
+      .then(() => {
+        if (!confirm('This will broadcast your score on the Hive blockchain (uses Resource Credits, not HIVE). Chain data is public and permanent. Continue?')) {
+          b.disabled = false; b.textContent = original; return;
         }
+        broadcastScore(stats, b);
       })
-      .catch(e => { b.textContent = 'Failed: ' + e.message; b.disabled = false; });
+      .catch(e => { alert('Login failed: ' + e.message); b.disabled = false; b.textContent = original; });
   }
 });
 el.overlay.addEventListener('click', e => { if (e.target === el.overlay && langOpen) closeLangMenu(); });
