@@ -8,3 +8,12 @@
 /phishing-untouched.json
 /final_queue.json
 /approved-targets.json
+/secrets/
+/run-with-key.sh
+/state.json
+/witness-voters-seen.json
+/approved-phishing-targets.json
+/watch-whale-votes.js
+/node_modules/
+/package.json
+/package-lock.json
