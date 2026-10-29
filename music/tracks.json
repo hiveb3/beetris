@@ -1,0 +1,98 @@
+[
+ {
+  "file": "liszt-la-campanella.mp3",
+  "composer": "Franz Liszt",
+  "title": "La Campanella",
+  "performer": "Greiss (piano)",
+  "license": "Public domain",
+  "source": "https://commons.wikimedia.org/wiki/File:Liszt-La_Campanella-Greiss.ogg"
+ },
+ {
+  "file": "rimsky-korsakov-flight-of-the-bumblebee.mp3",
+  "composer": "Nikolai Rimsky-Korsakov",
+  "title": "Flight of the Bumblebee",
+  "performer": "United States Air Force Band of the Rockies",
+  "license": "Public domain",
+  "source": "https://commons.wikimedia.org/wiki/File:Flight_of_the_Bumblebee_-_Concert_Band_-_United_States_Air_Force_Band_of_the_Rockies.mp3"
+ },
+ {
+  "file": "grieg-in-the-hall-of-the-mountain-king.mp3",
+  "composer": "Edvard Grieg",
+  "title": "In the Hall of the Mountain King",
+  "performer": "Musopen Symphony Orchestra",
+  "license": "Public domain",
+  "source": "https://commons.wikimedia.org/wiki/File:Musopen_-_In_the_Hall_Of_The_Mountain_King.ogg"
+ },
+ {
+  "file": "beethoven-symphony-no-5-i-allegro-con-brio.mp3",
+  "composer": "Ludwig van Beethoven",
+  "title": "Symphony No. 5 – I. Allegro con brio",
+  "performer": "see source page",
+  "license": "Public domain",
+  "source": "https://commons.wikimedia.org/wiki/File:Ludwig_van_Beethoven_-_Symphonie_5_c-moll_-_1._Allegro_con_brio.ogg"
+ },
+ {
+  "file": "vivaldi-the-four-seasons-spring-allegro.mp3",
+  "composer": "Antonio Vivaldi",
+  "title": "The Four Seasons – Spring (Allegro)",
+  "performer": "John Harrison (violin)",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Vivaldi_-_Four_Seasons_1_Spring_mvt_1_Allegro_-_John_Harrison_violin.oga"
+ },
+ {
+  "file": "mozart-eine-kleine-nachtmusik-i-allegro.mp3",
+  "composer": "Wolfgang Amadeus Mozart",
+  "title": "Eine kleine Nachtmusik – I. Allegro",
+  "performer": "see source page",
+  "license": "CC BY-SA 2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Mozart_-_Eine_kleine_Nachtmusik_-_1._Allegro.ogg"
+ },
+ {
+  "file": "dvo-k-symphony-no-9-from-the-new-world-iv.mp3",
+  "composer": "Antonín Dvořák",
+  "title": "Symphony No. 9 \"From the New World\" – IV",
+  "performer": "see source page",
+  "license": "Public domain",
+  "source": "https://commons.wikimedia.org/wiki/File:Antonin_Dvorak_-_symphony_no._9_in_e_minor_%27from_the_new_world%27,_op._95_-_iv._allegro_con_fuoco.ogg"
+ },
+ {
+  "file": "rossini-william-tell-overture-finale.mp3",
+  "composer": "Gioachino Rossini",
+  "title": "William Tell Overture – Finale",
+  "performer": "United States Marine Corps Band",
+  "license": "Public domain",
+  "source": "https://commons.wikimedia.org/wiki/File:Gioachino_Rossini,_William_Tell_Overture_(military_band_version,_2000).ogg"
+ },
+ {
+  "file": "wagner-ride-of-the-valkyries.mp3",
+  "composer": "Richard Wagner",
+  "title": "Ride of the Valkyries",
+  "performer": "Philip Milman (conductor)",
+  "license": "CC BY 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Ride_of_the_Valkyries.ogg"
+ },
+ {
+  "file": "bach-toccata-and-fugue-in-d-minor.mp3",
+  "composer": "Johann Sebastian Bach",
+  "title": "Toccata and Fugue in D minor",
+  "performer": "Philadelphia Orchestra, Leopold Stokowski (1927)",
+  "license": "Public domain",
+  "source": "https://commons.wikimedia.org/wiki/File:PDP-CH_-_Philadelphia_Orchestra,_Leopold_Stokowski_-_Toccata_and_Fugue_in_D_minor,_BWV_565_-_Bach_-_Hmv-d1428-5-0761.flac"
+ },
+ {
+  "file": "chopin-revolutionary-tude-op-10-no-12.mp3",
+  "composer": "Frédéric Chopin",
+  "title": "Revolutionary Étude, Op. 10 No. 12",
+  "performer": "Jason M. C. Han (piano)",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Chopin_Etude_Op.10_No.12_Revolutionary_-_JMC,_Han_(Modern_Piano_Harmony).ogg"
+ },
+ {
+  "file": "mussorgsky-night-on-bald-mountain.mp3",
+  "composer": "Modest Mussorgsky",
+  "title": "Night on Bald Mountain",
+  "performer": "see source page",
+  "license": "Public domain",
+  "source": "https://commons.wikimedia.org/wiki/File:Modest_Mussorgsky_-_night_on_bald_mountain.ogg"
+ }
+]
