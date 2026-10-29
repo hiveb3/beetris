@@ -1,4 +1,4 @@
-# Hive Block Producer: architecture and the road to versus play and Hive login
+# BeeTris: architecture and the road to versus play and Hive login
 
 This page explains how the pieces fit, what already exists, and the order to switch things on.
 Nothing here involves money: HIVE, HBD, HP and RC in the game stay play points.

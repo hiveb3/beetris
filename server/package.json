@@ -1,7 +1,7 @@
 {
   "name": "hive-block-producer-server",
   "private": true,
-  "description": "Reference relay and Hive login verifier for Hive Block Producer versus mode",
+  "description": "Reference relay and Hive login verifier for BeeTris versus mode",
   "main": "relay.js",
   "scripts": { "start": "node relay.js", "test": "node test.js" },
   "engines": { "node": ">=18" },

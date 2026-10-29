@@ -1,4 +1,4 @@
-# Hive Block Producer reference server
+# BeeTris reference server
 
 Small Node service for versus play and Hive login. See [../docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md).
 

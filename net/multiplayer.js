@@ -1,4 +1,4 @@
-/* Hive Block Producer: versus multiplayer module (not wired into the UI yet).
+/* BeeTris: versus multiplayer module (not wired into the UI yet).
  *
  * Builds on the game's public API (window.HBP) and never touches game internals.
  * A match is two or more players in a room. The host picks a seed, everyone starts with the same piece

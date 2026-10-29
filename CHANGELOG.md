@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Hive Block Producer. Newest first.
+All notable changes to BeeTris. Newest first.
 Versions follow vMAJOR.MINOR.PATCH: new features bump MINOR, bug fixes bump PATCH, and v1.0.0 will mark the end of beta.
 
 <!-- Generated from version.js by scripts/changelog.js. Edit version.js, not this file. -->

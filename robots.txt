@@ -3,4 +3,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://hiveb3.github.io/hive-block-producer/sitemap.xml
+Sitemap: https://hiveb3.github.io/beetris/sitemap.xml

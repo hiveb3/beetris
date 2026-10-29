@@ -1,4 +1,4 @@
-// Reference server for Hive Block Producer: Hive login challenges plus a WebSocket room relay for versus matches.
+// Reference server for BeeTris: Hive login challenges plus a WebSocket room relay for versus matches.
 // Run: npm install && node relay.js   (PORT, ALLOWED_ORIGIN and HIVE_NODES can be set in the environment)
 // It is deliberately small: it relays protocol v1 messages (see net/multiplayer.js) between players in a room
 // and attaches the verified Hive name to a player when the client sends a valid session token.
@@ -147,6 +147,6 @@ function createServer({ allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://d
 
 if (require.main === module) {
   const port = Number(process.env.PORT || 8787);
-  createServer().server.listen(port, () => console.log(`hive-block-producer relay on :${port}`));
+  createServer().server.listen(port, () => console.log(`BeeTris relay on :${port}`));
 }
 module.exports = { createServer, LIMITS };

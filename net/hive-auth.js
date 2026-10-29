@@ -1,4 +1,4 @@
-/* Hive Block Producer: Hive login module (not wired into the UI yet).
+/* BeeTris: Hive login module (not wired into the UI yet).
  *
  * What it does: proves a player controls a Hive account by having their wallet sign a one-time challenge
  * with the account's posting key. The game never sees a private key.
@@ -94,7 +94,7 @@
         score: Number((stats.total / 1000).toFixed(3)), lines: stats.lines | 0, hf: stats.hf | 0,
         seconds: stats.seconds | 0, seed: stats.seed >>> 0,
       };
-      window.hive_keychain.requestCustomJson(s.username, APP_ID, 'Posting', JSON.stringify(payload), 'Hive Block Producer score', res => {
+      window.hive_keychain.requestCustomJson(s.username, APP_ID, 'Posting', JSON.stringify(payload), 'BeeTris score', res => {
         if (res && res.success) report('hive-score-post');
         if (res && res.success) resolve({ txId: res.result && (res.result.id || res.result.tx_id), payload });
         else reject(new Error((res && (res.error || res.message)) || 'broadcast-rejected'));

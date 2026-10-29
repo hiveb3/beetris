@@ -1,4 +1,4 @@
-name: Deploy Hive Block Producer to GitHub Pages
+name: Deploy BeeTris to GitHub Pages
 
 on:
   push:

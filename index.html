@@ -7,13 +7,13 @@
 <meta name="description" content="BeeTris is a free browser block puzzle game with a Hive blockchain theme. Stack transactions, survive hardforks and dodge downvotes. No sign-up, works on phones.">
 <meta name="keywords" content="Hive, Hive blockchain, blockchain game, free browser game, block puzzle, falling block game, HTML5 game">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://hiveb3.github.io/hive-block-producer/">
+<link rel="canonical" href="https://hiveb3.github.io/beetris/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="BeeTris">
-<meta property="og:url" content="https://hiveb3.github.io/hive-block-producer/">
+<meta property="og:url" content="https://hiveb3.github.io/beetris/">
 <meta property="og:title" content="BeeTris | Free Browser Block Puzzle Game">
 <meta property="og:description" content="A free block puzzle game with a Hive blockchain theme. Stack transactions, survive hardforks, dodge downvotes. Plays in your browser, 8 languages.">
-<meta property="og:image" content="https://hiveb3.github.io/hive-block-producer/og-image.jpg">
+<meta property="og:image" content="https://hiveb3.github.io/beetris/og-image.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -22,9 +22,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="BeeTris | Free Browser Block Puzzle Game">
 <meta name="twitter:description" content="A free block puzzle game with a Hive blockchain theme. Stack transactions, survive hardforks, dodge downvotes. Plays in your browser.">
-<meta name="twitter:image" content="https://hiveb3.github.io/hive-block-producer/og-image.jpg">
+<meta name="twitter:image" content="https://hiveb3.github.io/beetris/og-image.jpg">
 <meta name="twitter:image:alt" content="BeeTris game screen: a stack of hexagon-marked blocks, wallet and Hive chain status panels">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"BeeTris","url":"https://hiveb3.github.io/hive-block-producer/","image":"https://hiveb3.github.io/hive-block-producer/og-image.jpg","description":"A free browser block puzzle game with a Hive blockchain theme. Unofficial fan project; in-game HIVE, HBD and RC are play points with no real value.","genre":["Puzzle","Block puzzle"],"gamePlatform":"Web browser","applicationCategory":"Game","operatingSystem":"Any","isAccessibleForFree":true,"inLanguage":["en","es","fr","zh-Hant","zh-Hans","ja","ko","hi"],"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"BeeTris","url":"https://hiveb3.github.io/beetris/","image":"https://hiveb3.github.io/beetris/og-image.jpg","description":"A free browser block puzzle game with a Hive blockchain theme. Unofficial fan project; in-game HIVE, HBD and RC are play points with no real value.","genre":["Puzzle","Block puzzle"],"gamePlatform":"Web browser","applicationCategory":"Game","operatingSystem":"Any","isAccessibleForFree":true,"inLanguage":["en","es","fr","zh-Hant","zh-Hans","ja","ko","hi"],"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <meta name="theme-color" content="#170a10">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 115'%3E%3Cpath d='M50 0l50 29v57l-50 29L0 86V29z' fill='%23e31337'/%3E%3Cpath d='M30 30h16l24 27-24 28H30l24-28z' fill='%23170a10'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -661,7 +661,7 @@ kbd {
     </div>
     <div class="hview" data-view="info" id="view-info" role="tabpanel" hidden>
       <h2 data-i18n="infoT">版本與更新</h2>
-      <p class="note"><span data-i18n="beta"></span> <a class="feedback-link" href="https://github.com/hiveb3/hive-block-producer/issues/new" target="_blank" rel="noopener" data-i18n="feedback"></a></p>
+      <p class="note"><span data-i18n="beta"></span> <a class="feedback-link" href="https://github.com/hiveb3/beetris/issues/new" target="_blank" rel="noopener" data-i18n="feedback"></a></p>
       <p class="note" id="privacyNote" data-i18n="privacy" hidden></p>
       <div class="box support-box" style="margin:14px 0">
         <h3 style="margin-top:0;font-size:13px">💝 Support the developer</h3>
@@ -1678,7 +1678,7 @@ function gameOver() {
     <p class="ver-note">BeeTris v${VERSION.version} · 🐝 <a href="https://vote.hive.uno/@hive3" target="_blank" rel="noopener" style="color:inherit">Vote the real @hive3 witness</a></p>`); }, 700);
 }
 function shareScore(total, lines, hf, btn) {
-  const text = `I just scored ${fmt3(total)} on BeeTris 🐝🧱 — ${lines} lines cleared, HF${hf}. Can you beat me?\nhttps://hiveb3.github.io/hive-block-producer/`;
+  const text = `I just scored ${fmt3(total)} on BeeTris 🐝🧱 — ${lines} lines cleared, HF${hf}. Can you beat me?\nhttps://hiveb3.github.io/beetris/`;
   const copy = navigator.clipboard && navigator.clipboard.writeText
     ? navigator.clipboard.writeText(text).then(() => true).catch(() => false)
     : Promise.resolve(false);
