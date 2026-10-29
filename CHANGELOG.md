@@ -5,6 +5,13 @@ Versions follow vMAJOR.MINOR.PATCH: new features bump MINOR, bug fixes bump PATC
 
 <!-- Generated from version.js by scripts/changelog.js. Edit version.js, not this file. -->
 
+## v0.12.0 (2026-10-29)
+
+- Gentler soft drop: holding down starts slow and speeds up with each hardfork, instead of racing from the first piece.
+- Chain events are calmer: they come less often and show as a small notice at the top of the board instead of a big banner in the middle.
+- The Rules page now explains what each chain event does (whale upvote, downvote, airdrop, missed block, swarm, spam), in all 8 languages.
+- Home screen note updated: Hive login and on-chain records are live.
+
 ## v0.11.1 (2026-10-26)
 
 - Rotation kicks now also try moving the piece down a row, fixing cases where a rotate felt completely dead once the stack got tall and cluttered at high speed.

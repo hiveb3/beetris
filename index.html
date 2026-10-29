@@ -204,6 +204,10 @@ kbd {
   transition: opacity 0.18s, transform 0.18s;
 }
 .banner.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.banner.mini { top: 4%; padding: 5px 10px 6px; border-radius: 8px; opacity: 0; }
+.banner.mini.show { opacity: 0.9; }
+.banner.mini b { font-size: 13px; }
+.banner.mini span { font-size: 10.5px; margin-top: 1px; }
 .banner b { display: block; font: 800 18px/1.25 var(--f-display); letter-spacing: 0.04em; }
 .banner span { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
 .banner.good { border-color: var(--good); } .banner.good b { color: var(--good); }
@@ -1049,6 +1053,7 @@ const lvl = () => (S.hf - 24) + (S.era.id === 'fast' ? 2 : 0);
 const mult = () => S.hf - 23;
 // new players get a slow warm-up until their first clear (or WARM_PIECES pieces), so a first row is reachable on a phone
 const WARM_MS = 1300, WARM_LOCK_MS = 800, WARM_PIECES = 14, CLEARED_KEY = 'hive-tetris-cleared';
+const softMs = () => Math.max(35, 140 - 12 * Math.max(0, lvl())); // gentle soft drop at the start, faster each hardfork
 const gravityMs = () => { const g = Math.max(55, Math.round(850 * Math.pow(0.8, lvl()))); return S.warm ? Math.max(g, WARM_MS) : g; };
 
 function makeQ(type) {
@@ -1101,13 +1106,14 @@ function cellsOf(p) {
 }
 
 /* ---------- feed / banner / fx ---------- */
-let bannerTimer = 0;
+let bannerTimer = 0, evMini = false;
 function banner(title, sub, tone = 'info', ms = 1900) {
   el.banner.innerHTML = '';
   const b = document.createElement('b'); b.textContent = title;
   const s = document.createElement('span'); s.textContent = sub;
   el.banner.append(b, s);
-  el.banner.className = 'banner show ' + tone;
+  el.banner.className = 'banner show ' + tone + (evMini ? ' mini' : '');
+  if (evMini) ms = Math.min(ms, 1500);
   clearTimeout(bannerTimer);
   bannerTimer = setTimeout(() => el.banner.classList.remove('show'), ms);
 }
@@ -1422,11 +1428,13 @@ function fireEvent() {
   const list = EVENTS.filter(e => !e.when || e.when());
   const ws = list.map(e => e.w * (S.era.id === 'whale' && e.id === 'upvote' ? 3 : 1));
   let r = Math.random() * ws.reduce((a, b) => a + b, 0);
-  for (let i = 0; i < list.length; i++) { r -= ws[i]; if (r <= 0) { list[i].run(); return; } }
-  list[list.length - 1].run();
+  let pick = list[list.length - 1];
+  for (let i = 0; i < list.length; i++) { r -= ws[i]; if (r <= 0) { pick = list[i]; break; } }
+  evMini = true;
+  try { pick.run(); } finally { evMini = false; }
 }
 function scheduleEvent() {
-  S.nextEvent = S.t + rint(15000, 26000) * (S.era.id === 'whale' ? 0.55 : 1);
+  S.nextEvent = S.t + rint(24000, 40000) * (S.era.id === 'whale' ? 0.55 : 1);
 }
 function payInterest() {
   if (S.hbd <= 0) return;
@@ -1856,7 +1864,7 @@ function update(dt) {
   if (!S.cur) return;
   const frozen = S.t < S.frozenUntil;
   if (!frozen || held.down) {
-    const g = held.down ? Math.min(gravityMs(), 35) : gravityMs();
+    const g = held.down ? Math.min(gravityMs(), softMs()) : gravityMs();
     S.dropAcc += dt;
     while (S.dropAcc >= g) {
       S.dropAcc -= g;

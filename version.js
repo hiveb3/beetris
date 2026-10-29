@@ -4,6 +4,16 @@
    Versioning: vMAJOR.MINOR.PATCH. New features bump MINOR, bug fixes bump PATCH; v1.0.0 marks the end of beta. */
 window.HBP_RELEASES = [
   {
+    version: '0.12.0',
+    date: '2026-10-29',
+    notes: [
+      'Gentler soft drop: holding down starts slow and speeds up with each hardfork, instead of racing from the first piece.',
+      'Chain events are calmer: they come less often and show as a small notice at the top of the board instead of a big banner in the middle.',
+      'The Rules page now explains what each chain event does (whale upvote, downvote, airdrop, missed block, swarm, spam), in all 8 languages.',
+      'Home screen note updated: Hive login and on-chain records are live.',
+    ],
+  },
+  {
     version: '0.11.1',
     date: '2026-10-26',
     notes: [
