@@ -722,6 +722,7 @@ kbd {
         <li><span data-i18n="summonBee">召喚工蜂</span><span><kbd>B</kbd></span></li>
         <li><span data-i18n="kPauseMute">暫停 / 音效</span><span><kbd>P</kbd><kbd>M</kbd></span></li>
         <li><span data-i18n="kMusic">音樂</span><span><kbd>N</kbd></span></li>
+        <li><span data-i18n="kTrack">Next track</span><span><kbd>T</kbd></span></li>
         <li><span data-i18n="kLang">切換語言</span><span><kbd>L</kbd></span></li>
       </ul>
     </section>
@@ -1008,7 +1009,7 @@ function musicTick() {
     music.step = (music.step + 1) % SONG_STEPS.length;
   }
 }
-function musicStart() {
+function synthStart() {
   if (music.playing || !actx) return;
   try {
     musicSetup();
@@ -1020,11 +1021,50 @@ function musicStart() {
     clearInterval(music.timer); music.timer = setInterval(musicTick, 25); musicTick();
   } catch (e) { music.playing = false; }
 }
-function musicStop() {
+function synthStop() {
   if (!music.playing) return;
   music.playing = false;
   clearInterval(music.timer); music.timer = 0;
   try { const g = music.gain.gain, now = actx.currentTime; g.cancelScheduledValues(now); g.setValueAtTime(g.value, now); g.linearRampToValueAtTime(0, now + 0.35); } catch (e) { /* ignore */ }
+}
+
+/* ---------- classical soundtrack: public-domain recordings from music/tracks.json ----------
+   If the playlist loads, it plays shuffled, one track after another, with a credit toast on each
+   track. If it can't load (offline, missing file), the original 8-bit synth loop plays instead. */
+const PL = { list: [], order: [], i: -1, audio: null, loaded: false, playing: false };
+fetch('music/tracks.json').then(r => (r.ok ? r.json() : [])).then(list => {
+  PL.list = (Array.isArray(list) ? list : []).filter(t => t && t.file);
+  PL.loaded = true;
+  if (PL.list.length) { PL.order = PL.list.map((_, k) => k).sort(() => Math.random() - 0.5); musicSync(); }
+}).catch(() => { PL.loaded = true; });
+const plTrack = () => PL.list[PL.order[PL.i]];
+function plCredit(tr) { return `♪ ${tr.composer} – ${tr.title}${tr.performer ? ' · ' + tr.performer : ''} (${tr.license})`; }
+function plLoad(next) {
+  if (!PL.audio) {
+    PL.audio = new Audio(); PL.audio.preload = 'auto';
+    PL.audio.addEventListener('ended', () => { plLoad(true); if (PL.playing) plPlay(); });
+    PL.audio.addEventListener('error', () => { if (PL.playing) { plLoad(true); plPlay(); } });
+  }
+  if (next || PL.i < 0) { PL.i = (PL.i + 1) % PL.order.length; PL.audio.src = 'music/' + plTrack().file; PL.fresh = true; }
+}
+function plPlay() {
+  PL.audio.volume = muted ? 0 : 0.45;
+  PL.audio.play().then(() => { if (PL.fresh) { PL.fresh = false; toast(plCredit(plTrack()), 4200); } }).catch(() => {});
+}
+function musicStart() {
+  if (PL.list.length) {
+    if (PL.playing) return;
+    synthStop(); plLoad(false); PL.playing = true; plPlay(); return;
+  }
+  synthStart();
+}
+function musicStop() {
+  if (PL.playing) { PL.playing = false; try { PL.audio.pause(); } catch (e) { /* ignore */ } }
+  synthStop();
+}
+function musicNext() {
+  if (!PL.list.length || !musicOn) return;
+  plLoad(true); if (PL.playing) plPlay();
 }
 // music plays only while a game is actually running and the tab is visible
 function musicSync() { if (musicOn && S && S.state === 'play' && !document.hidden && actx) musicStart(); else musicStop(); }
@@ -1035,6 +1075,7 @@ function toggleMusic() {
 }
 function toggleMute() {
   muted = !muted; store.set('hive-tetris-muted', muted ? '1' : '0');
+  if (PL.audio) PL.audio.volume = muted ? 0 : 0.45;
   updateButtons();
   if (!muted) initAudio();
 }
@@ -1451,6 +1492,7 @@ function inputDown(a) {
   if (langOpen) return;
   if (a === 'mute') { toggleMute(); return; }
   if (a === 'music') { toggleMusic(); return; }
+  if (a === 'track') { musicNext(); return; }
   if (a === 'lang') { openLangMenu(); return; }
   if (a === 'pause') { togglePause(); return; }
   if (S.state !== 'play') return;
@@ -1477,7 +1519,7 @@ function inputUp(a) {
 }
 const KEYMAP = {
   ArrowLeft: 'left', ArrowRight: 'right', ArrowDown: 'down', ArrowUp: 'rotate', KeyX: 'rotate', KeyZ: 'rotateL',
-  Space: 'drop', KeyC: 'hold', ShiftLeft: 'hold', ShiftRight: 'hold', KeyB: 'bee', KeyP: 'pause', Escape: 'pause', KeyM: 'mute', KeyN: 'music', KeyL: 'lang',
+  Space: 'drop', KeyC: 'hold', ShiftLeft: 'hold', ShiftRight: 'hold', KeyB: 'bee', KeyP: 'pause', Escape: 'pause', KeyM: 'mute', KeyN: 'music', KeyT: 'track', KeyL: 'lang',
 };
 addEventListener('keydown', e => {
   if (e.target && e.target.matches && e.target.matches('input, textarea, select')) return;
@@ -1792,7 +1834,7 @@ function renderHome() {
   $('#homeKeys').innerHTML = `
     <span><kbd>←</kbd><kbd>→</kbd> ${t('kmMove')}</span><span><kbd>↑</kbd><kbd>X</kbd> ${t('kmRot')}</span><span><kbd>Z</kbd> ${t('kmRotL')}</span>
     <span><kbd>↓</kbd> ${t('kmSoft')}</span><span><kbd>${t('space')}</kbd> ${t('kmHard')}</span><span><kbd>C</kbd> ${t('kmHold')}</span>
-    <span><kbd>B</kbd> ${t('kmBee')}</span><span><kbd>P</kbd> ${t('kmPause')}</span><span><kbd>N</kbd> ${t('kMusic')}</span><span><kbd>L</kbd> ${t('kLang')}</span>`;
+    <span><kbd>B</kbd> ${t('kmBee')}</span><span><kbd>P</kbd> ${t('kmPause')}</span><span><kbd>N</kbd> ${t('kMusic')}</span><span><kbd>T</kbd> ${t('kTrack')}</span><span><kbd>L</kbd> ${t('kLang')}</span>`;
   const runs = loadRuns();
   const shareBtn = $('#shareBestBtn');
   if (!runs.length) {

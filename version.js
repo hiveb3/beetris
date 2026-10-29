@@ -4,6 +4,14 @@
    Versioning: vMAJOR.MINOR.PATCH. New features bump MINOR, bug fixes bump PATCH; v1.0.0 marks the end of beta. */
 window.HBP_RELEASES = [
   {
+    version: '0.13.0',
+    date: '2026-10-29',
+    notes: [
+      'Classical soundtrack: famous public-domain pieces (Liszt, Rimsky-Korsakov, Grieg, Beethoven, Vivaldi and more) play shuffled during the game, with a credit for each track.',
+      'Press T for the next track. If the music can\'t load, the original 8-bit loop plays instead.',
+    ],
+  },
+  {
     version: '0.12.1',
     date: '2026-10-29',
     notes: [
