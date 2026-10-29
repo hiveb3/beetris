@@ -4,6 +4,13 @@
    Versioning: vMAJOR.MINOR.PATCH. New features bump MINOR, bug fixes bump PATCH; v1.0.0 marks the end of beta. */
 window.HBP_RELEASES = [
   {
+    version: '0.12.1',
+    date: '2026-10-29',
+    notes: [
+      'Global leaderboard: tap a player to congratulate them with a ready-made Wave on Ecency.',
+    ],
+  },
+  {
     version: '0.12.0',
     date: '2026-10-29',
     notes: [

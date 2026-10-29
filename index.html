@@ -204,6 +204,8 @@ kbd {
   transition: opacity 0.18s, transform 0.18s;
 }
 .banner.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.lb-user { color: inherit; text-decoration: none; border-bottom: 1px dotted currentColor; }
+.lb-user:hover { color: var(--honey); }
 .banner.mini { top: 4%; padding: 5px 10px 6px; border-radius: 8px; opacity: 0; }
 .banner.mini.show { opacity: 0.9; }
 .banner.mini b { font-size: 13px; }
@@ -2443,6 +2445,12 @@ requestAnimationFrame(frame);
   const LB_PAGE_SIZE = 20;
   let lbPeriod = 'alltime', lbOffset = 0, lbEntries = [];
   function lbMe() { const s = window.HBPAuth && window.HBPAuth.current(); return s ? s.username : null; }
+  // Clicking a player opens an Ecency Wave composer with a ready-made congratulations message.
+  function congratsUrl(u, score, rank) {
+    const period = { daily: 'today', weekly: 'this week', alltime: 'of all time' }[lbPeriod] || '';
+    const msg = `🐝 Congrats @${u}! #${rank} on the BeeTris leaderboard ${period} with ${Number(score).toFixed(3)} HIVE (play points) 🏆🍯 Can you beat it? https://hiveb3.github.io/beetris/ #beetris #hivegaming`;
+    return 'https://ecency.com/waves?text=' + encodeURIComponent(msg);
+  }
   function renderGlobalLeaderboard(d) {
     const el2 = $('#globalLeaderboard'), moreBtn = $('#lbMoreBtn'), rankEl = $('#lbMyRank');
     const entries = (d && d.entries) || [];
@@ -2453,7 +2461,7 @@ requestAnimationFrame(frame);
     // comparable between players regardless of where they're playing from
     const fmtWhen = iso => { try { return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' }) + ' UTC'; } catch (e) { return ''; } };
     el2.innerHTML = entries.length
-      ? entries.map((e, i) => `<li>#${i + 1} <b>@${e.username}</b> — ${e.score.toFixed(3)} <small style="opacity:.6">${fmtWhen(e.at)}</small></li>`).join('')
+      ? entries.map((e, i) => { const u = String(e.username || '').toLowerCase().replace(/[^a-z0-9.-]/g, ''); return `<li>#${i + 1} <a class="lb-user" href="${congratsUrl(u, e.score, i + 1)}" target="_blank" rel="noopener" title="Congratulate @${u} with a Wave on Ecency"><b>@${u}</b> 🎉</a> — ${e.score.toFixed(3)} <small style="opacity:.6">${fmtWhen(e.at)}</small></li>`; }).join('')
       : (lbOffset === 0 ? '<li style="opacity:.6">No verified scores yet — be the first!</li>' : '<li style="opacity:.6">No more entries.</li>');
     const total = (d && d.total) || 0;
     if (moreBtn) moreBtn.hidden = lbOffset + entries.length >= total;

@@ -5,6 +5,10 @@ Versions follow vMAJOR.MINOR.PATCH: new features bump MINOR, bug fixes bump PATC
 
 <!-- Generated from version.js by scripts/changelog.js. Edit version.js, not this file. -->
 
+## v0.12.1 (2026-10-29)
+
+- Global leaderboard: tap a player to congratulate them with a ready-made Wave on Ecency.
+
 ## v0.12.0 (2026-10-29)
 
 - Gentler soft drop: holding down starts slow and speeds up with each hardfork, instead of racing from the first piece.
