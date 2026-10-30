@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* BeeTris Soundtrack Contest payouts from @beetris.contest.
+/* BeeTris Soundtrack Contest payouts from @pollenpatron.
  *
  *   node scripts/contest-payout.js start 1st 2nd 3rd
  *     1. sends the liquid HBD 60/25/15 to the winners
@@ -8,13 +8,13 @@
  *        winners' wallets automatically, no further action or cron needed
  *   add --dry to only print what it would do.
  *
- * Needs BEETRIS_CONTEST_ACTIVE_KEY in the environment (never hard-code it) and @hiveio/dhive
+ * Needs POLLENPATRON_ACTIVE_KEY in the environment (never hard-code it) and @hiveio/dhive
  * (already a dependency of server/).
  */
 const path = require('path');
 const { Client, PrivateKey } = require(require.resolve('@hiveio/dhive', { paths: [path.join(__dirname, '..', 'server'), __dirname] }));
 
-const ACCOUNT = 'beetris.contest';
+const ACCOUNT = 'pollenpatron';
 const SPLIT = [0.60, 0.25, 0.15];
 const client = new Client(['https://api.hive.blog', 'https://api.deathwing.me', 'https://api.openhive.network']);
 const dry = process.argv.includes('--dry');
@@ -23,8 +23,8 @@ const args = process.argv.slice(2).filter(a => a !== '--dry');
 const amt = s => parseFloat(String(s).split(' ')[0]);
 const fmt = (n, sym) => `${(Math.floor(n * 1000) / 1000).toFixed(3)} ${sym}`;
 const key = () => {
-  const k = process.env.BEETRIS_CONTEST_ACTIVE_KEY;
-  if (!k && !dry) { console.error('Set BEETRIS_CONTEST_ACTIVE_KEY'); process.exit(1); }
+  const k = process.env.POLLENPATRON_ACTIVE_KEY;
+  if (!k && !dry) { console.error('Set POLLENPATRON_ACTIVE_KEY'); process.exit(1); }
   return k ? PrivateKey.fromString(k) : null;
 };
 const send = async (ops, label) => {
