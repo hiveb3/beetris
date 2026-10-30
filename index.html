@@ -204,6 +204,10 @@ kbd {
   transition: opacity 0.18s, transform 0.18s;
 }
 .banner.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.playlist-box { margin-top: 14px; }
+.pl-tools { display: flex; gap: 6px; margin: 6px 0; }
+.pl-list { display: grid; gap: 4px; max-height: 220px; overflow: auto; margin: 6px 0 10px; font-size: 13px; }
+.pl-item { display: flex; gap: 8px; align-items: center; cursor: pointer; }
 .lb-user { color: inherit; text-decoration: none; border-bottom: 1px dotted currentColor; }
 .lb-user:hover { color: var(--honey); }
 .banner.mini { top: 4%; padding: 5px 10px 6px; border-radius: 8px; opacity: 0; }
@@ -630,6 +634,7 @@ kbd {
             <button class="primary" type="submit" data-i18n="guestPlay">以訪客身分開始</button>
             <button class="secondary hive-login" id="homeHiveLoginBtn" type="button"><span data-i18n="hiveLogin">用 Hive 帳號登入</span></button>
             <p class="note login-note" data-i18n="loginNote"></p>
+            <p class="note onboard-note">🐝 <span data-i18n="newToHive">New to Hive?</span> <a href="https://ecency.com/signup/free?referral=hive3" target="_blank" rel="noopener" data-i18n="createAccount">Create a free account on Ecency</a></p>
           </form>
           <p class="disclaimer"><span data-i18n="disclaimer"></span> <span data-i18n="unofficial"></span></p>
           <p class="disclaimer">🐝 Fun fact: <a href="https://vote.hive.uno/@hive3" target="_blank" rel="noopener" style="color:inherit">@hive3</a> is a real Hive witness, not just this game's theme. A vote helps it actually produce blocks!</p>
@@ -645,6 +650,14 @@ kbd {
       <h2 data-i18n="controls">操作</h2>
       <div class="keys" id="homeKeys"></div>
       <p class="note" data-i18n="touchHint"></p>
+      <div class="box playlist-box" id="playlistBox" hidden>
+        <h3 style="margin-top:0">🎵 <span data-i18n="plTitle">My playlist</span></h3>
+        <p class="note" data-i18n="plHint"></p>
+        <div class="pl-tools"><button type="button" class="ghost-btn" id="plAll" data-i18n="plAll">All</button><button type="button" class="ghost-btn" id="plNone" data-i18n="plNone">None</button></div>
+        <div class="pl-list" id="plList"></div>
+        <button type="button" class="primary" id="plSaveBtn" data-i18n="plSave">Save playlist</button>
+        <p class="note" id="plStatus" style="min-height:1.2em"></p>
+      </div>
     </div>
     <div class="hview" data-view="records" id="view-records" role="tabpanel" hidden>
       <h2 data-i18n="records">紀錄</h2>
@@ -1033,10 +1046,54 @@ function synthStop() {
    track. If it can't load (offline, missing file), the original 8-bit synth loop plays instead. */
 const PL = { list: [], order: [], i: -1, audio: null, loaded: false, playing: false };
 fetch('music/tracks.json').then(r => (r.ok ? r.json() : [])).then(list => {
-  PL.list = (Array.isArray(list) ? list : []).filter(t => t && t.file);
+  PL.all = (Array.isArray(list) ? list : []).filter(t => t && t.file);
   PL.loaded = true;
-  if (PL.list.length) { PL.order = PL.list.map((_, k) => k).sort(() => Math.random() - 0.5); musicSync(); }
+  plApplySelection(plLoadLocal());
+  renderPlaylistBox();
+  musicSync();
 }).catch(() => { PL.loaded = true; });
+/* ---------- personal playlist: which tracks play. Saved in this browser, and for Hive-verified players
+   also on the relay server, so it follows them to other devices. Empty selection = all tracks. ---------- */
+const PL_KEY = 'beetris-playlist';
+function plLoadLocal() { try { const v = JSON.parse(store.get(PL_KEY) || 'null'); return Array.isArray(v) ? v : null; } catch (e) { return null; } }
+function plApplySelection(sel) {
+  const all = PL.all || [];
+  const chosen = sel && sel.length ? all.filter(t => sel.includes(t.file)) : all;
+  PL.sel = sel && sel.length ? sel.slice() : null;
+  PL.list = chosen.length ? chosen : all;
+  PL.order = PL.list.map((_, k) => k).sort(() => Math.random() - 0.5);
+  PL.i = -1;
+  if (PL.playing) { plLoad(true); plPlay(); }
+}
+function plRelay() { return window.HBP_RELAY_HTTP || ''; }
+function plSession() { const s = window.HBPAuth && window.HBPAuth.current(); return s && s.verified && s.token ? s : null; }
+function plFetchRemote() {
+  const s = plSession(); if (!s || !plRelay()) return;
+  fetch(`${plRelay()}/playlist?token=${encodeURIComponent(s.token)}`).then(r => r.ok ? r.json() : null).then(d => {
+    const tr = d && d.playlist && d.playlist.tracks;
+    if (Array.isArray(tr)) { store.set(PL_KEY, JSON.stringify(tr)); plApplySelection(tr); renderPlaylistBox(); }
+  }).catch(() => {});
+}
+function plSave(sel) {
+  store.set(PL_KEY, JSON.stringify(sel));
+  plApplySelection(sel);
+  const s = plSession(), st = $('#plStatus');
+  if (!s || !plRelay()) { if (st) st.textContent = t('plSavedLocal'); return; }
+  fetch(`${plRelay()}/playlist`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: s.token, tracks: sel }) })
+    .then(r => { if (st) st.textContent = r.ok ? t('plSavedHive', { u: s.username }) : t('plSavedLocal'); })
+    .catch(() => { if (st) st.textContent = t('plSavedLocal'); });
+}
+function renderPlaylistBox() {
+  const box = $('#playlistBox'); if (!box) return;
+  const all = PL.all || [];
+  if (!all.length) { box.hidden = true; return; }
+  box.hidden = false;
+  const sel = PL.sel;
+  const esc = x => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  $('#plList').innerHTML = all.map(tr => `<label class="pl-item"><input type="checkbox" value="${esc(tr.file)}" ${!sel || sel.includes(tr.file) ? 'checked' : ''}> <b>${esc(tr.composer)}</b> – ${esc(tr.title)}</label>`).join('');
+}
+window.BeePL = { save: plSave, fetchRemote: plFetchRemote };
+
 const plTrack = () => PL.list[PL.order[PL.i]];
 function plCredit(tr) { return `♪ ${tr.composer} – ${tr.title}${tr.performer ? ' · ' + tr.performer : ''} (${tr.license})`; }
 function plLoad(next) {
@@ -2397,6 +2454,15 @@ requestAnimationFrame(frame);
   const RELAY_WS = params.get('relay') || 'wss://relay.hive-b-three.workers.dev';
   const RELAY_HTTP = params.get('relayHttp') || 'https://relay.hive-b-three.workers.dev';
   window.HBP_RELAY_HTTP = RELAY_HTTP; // exposed for the game-over sheet's postscore handler, defined earlier in the file
+  // playlist box: buttons, and reload the saved playlist whenever the Hive login changes
+  document.querySelector('#plAll').addEventListener('click', () => document.querySelector('#plList').querySelectorAll('input').forEach(c => { c.checked = true; }));
+  document.querySelector('#plNone').addEventListener('click', () => document.querySelector('#plList').querySelectorAll('input').forEach(c => { c.checked = false; }));
+  document.querySelector('#plSaveBtn').addEventListener('click', () => {
+    const boxes = [...document.querySelector('#plList').querySelectorAll('input')], on = boxes.filter(c => c.checked).map(c => c.value);
+    window.BeePL.save(on.length === boxes.length ? [] : on);
+  });
+  if (window.HBPAuth) window.HBPAuth.onChange(() => window.BeePL.fetchRemote());
+  setTimeout(() => window.BeePL.fetchRemote(), 800);
 
   const $ = s => document.querySelector(s);
   const loginBtn = $('#hiveLoginBtn'), pName = $('#pName'), pStatus = $('#pStatus');

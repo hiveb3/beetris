@@ -5,6 +5,11 @@ Versions follow vMAJOR.MINOR.PATCH: new features bump MINOR, bug fixes bump PATC
 
 <!-- Generated from version.js by scripts/changelog.js. Edit version.js, not this file. -->
 
+## v0.14.0 (2026-10-30)
+
+- My playlist: in Controls, choose which tracks play. Logged in with Hive, your playlist is saved to your account and follows you to any device.
+- New to Hive? The home screen now links to a free Ecency signup (ecency.com/signup/free), invited by @hive3.
+
 ## v0.13.0 (2026-10-29)
 
 - Classical soundtrack: famous public-domain pieces (Liszt, Rimsky-Korsakov, Grieg, Beethoven, Vivaldi and more) play shuffled during the game, with a credit for each track.

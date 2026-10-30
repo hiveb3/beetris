@@ -4,6 +4,14 @@
    Versioning: vMAJOR.MINOR.PATCH. New features bump MINOR, bug fixes bump PATCH; v1.0.0 marks the end of beta. */
 window.HBP_RELEASES = [
   {
+    version: '0.14.0',
+    date: '2026-10-30',
+    notes: [
+      'My playlist: in Controls, choose which tracks play. Logged in with Hive, your playlist is saved to your account and follows you to any device.',
+      'New to Hive? The home screen now links to a free Ecency signup (ecency.com/signup/free), invited by @hive3.',
+    ],
+  },
+  {
     version: '0.13.0',
     date: '2026-10-29',
     notes: [

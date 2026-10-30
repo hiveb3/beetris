@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const { WebSocketServer } = require('ws');
 const { verifyLogin, defaultClient } = require('./hive-verify');
 const { submitScore, getLeaderboard, getLeaderboardPeriod, getRank } = require('./leaderboard');
+const { getPlaylist, setPlaylist } = require('./playlists');
 
 const LIMITS = {
   msgBytes: 4096, msgsPerSecond: 30, playersPerRoom: 8, challengeMs: 5 * 60e3, sessionMs: 7 * 864e5,
@@ -81,6 +82,16 @@ function createServer({ allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://d
       const r = await submitScore({ username, txId: body.txId, score }, hiveClient ?? undefined)
         .catch(() => ({ ok: false, reason: 'node-error' }));
       return json(res, r.ok ? 200 : 400, r);
+    }
+    // per-player playlist (verified Hive users only): GET ?token=…  /  POST { token, tracks: [file names] }
+    if (url.pathname === '/playlist' && (req.method === 'GET' || req.method === 'POST')) {
+      let body = {};
+      if (req.method === 'POST') { try { body = await readBody(req); } catch (e) { return json(res, 400, { error: 'bad-body' }); } }
+      const token = String(req.method === 'GET' ? url.searchParams.get('token') || '' : body.token || '');
+      const s = token && sessions.get(token);
+      if (!s || s.expires < Date.now()) return json(res, 401, { error: 'login-required' });
+      if (req.method === 'GET') return json(res, 200, { ok: true, username: s.username, playlist: getPlaylist(s.username) });
+      return json(res, 200, { ok: true, username: s.username, playlist: setPlaylist(s.username, body.tracks) });
     }
     json(res, 404, { error: 'not-found' });
   });
