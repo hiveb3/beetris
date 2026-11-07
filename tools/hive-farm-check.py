@@ -11,7 +11,7 @@ import json, sys, time, urllib.request, collections, csv, datetime as dt
 COMM = sys.argv[1] if len(sys.argv) > 1 else 'hive-110713'
 DAYS = int(sys.argv[2]) if len(sys.argv) > 2 else 14
 API = sys.argv[3] if len(sys.argv) > 3 else 'https://api.hive.blog'
-CUTOFF = dt.datetime.utcnow() - dt.timedelta(days=DAYS)
+CUTOFF = dt.datetime.now(dt.timezone.utc).replace(tzinfo=None) - dt.timedelta(days=DAYS)
 
 def rpc(method, params):
     body = json.dumps({"jsonrpc": "2.0", "method": method, "params": params, "id": 1}).encode()
@@ -36,6 +36,7 @@ while True:
     if not page: break
     stop = False
     for x in page:
+        if (x.get('stats') or {}).get('is_pinned'): continue   # pinned posts are old: skip, don't stop
         if dt.datetime.fromisoformat(x['created']) < CUTOFF: stop = True; break
         posts.append(x)
     if stop: break
