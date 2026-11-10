@@ -4,6 +4,10 @@ A free browser block puzzle game with a Hive blockchain theme. Stack transaction
 
 **Play:** https://hiveb3.github.io/beetris/
 
+## Credits
+
+BeeTris is a fork of **Hive Block Producer**, the original game created by [@deanliu](https://peakd.com/@deanliu). Thank you for the idea and the code this game grew from. 🐝
+
 - No login, no install, works on desktop and mobile, 8 languages.
 - All HIVE, HBD, HP and RC in the game are game points only. They are not real cryptocurrency, have no value and cannot be withdrawn. The game does not connect to any wallet or blockchain.
 - Unofficial fan project, not affiliated with Hive.
