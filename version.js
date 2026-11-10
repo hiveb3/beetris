@@ -140,3 +140,25 @@ window.HBP_RELEASES = [
     ],
   },
 ];
+
+// Credit to the original author (shown on the home screen and in the info tab).
+(function () {
+  function addCredit() {
+    var html = '🎮 BeeTris is a fork of <b>Hive Block Producer</b>, the original game by ' +
+      '<a href="https://peakd.com/@deanliu" target="_blank" rel="noopener" style="color:inherit">@deanliu</a>. Thank you! 🐝';
+    var spots = [];
+    var disc = document.querySelectorAll('.disclaimer');
+    if (disc.length) spots.push(disc[disc.length - 1].parentNode);
+    var info = document.getElementById('view-info');
+    if (info) spots.push(info);
+    spots.forEach(function (parent) {
+      if (parent.querySelector('.credit-deanliu')) return;
+      var p = document.createElement('p');
+      p.className = 'disclaimer credit-deanliu';
+      p.innerHTML = html;
+      parent.appendChild(p);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addCredit);
+  else addCredit();
+})();
