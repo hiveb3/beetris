@@ -1,0 +1,254 @@
+<!doctype html>
+<!-- BeeBlurt · Open source (MIT) · AI-generated with Claude (Anthropic), reviewed by a human · by the @hive3 hive 🐝 -->
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BeeBlurt 🐝 a light front-end for Blurt</title>
+<meta name="description" content="BeeBlurt: a light, fast and friendly front-end for the Blurt blockchain. Read, vote, comment and post with WhaleVault.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐝</text></svg>">
+<style>
+:root{--bg:#fffaf0;--card:#fff;--fg:#2b2016;--muted:#7a6448;--line:#eedcb0;--honey:#e09a00;--soft:#fff1c7;--ok:#2e7d46;--bad:#c62828}
+@media (prefers-color-scheme:dark){:root{--bg:#18150f;--card:#221d15;--fg:#f3e9d2;--muted:#b9a582;--line:#3e3426;--honey:#f2b705;--soft:#352b1c;--ok:#6fcf8f;--bad:#ef6b6b}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--honey)}img{max-width:100%;height:auto}
+header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line)}
+.bar{max-width:1000px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:8px 14px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:21px;text-decoration:none;color:var(--fg)}.logo span{color:var(--honey)}
+nav a{margin:0 6px;text-decoration:none;color:var(--muted);font-weight:600}nav a.on{color:var(--honey)}
+.sp{flex:1}.btn{font:inherit;font-size:14px;padding:6px 12px;border-radius:9px;border:1px solid var(--honey);background:var(--honey);color:#241800;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.g{background:transparent;color:var(--fg)}.btn:disabled{opacity:.5;cursor:default}
+main{max-width:1000px;margin:0 auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 10px;display:flex;gap:12px}
+.card .th{flex:0 0 130px;height:90px;border-radius:8px;object-fit:cover;background:var(--soft)}
+.card h2{font-size:17px;margin:0 0 4px;line-height:1.3}.card h2 a{color:var(--fg);text-decoration:none}
+.meta{color:var(--muted);font-size:13.5px}.meta a{color:var(--muted)}
+.sum{font-size:14px;color:var(--muted);margin:4px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;font-size:14px}
+.post{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.post h1{font-size:28px;line-height:1.25;margin:0 0 8px}
+.body{overflow-wrap:anywhere}.body img{border-radius:8px;display:block;margin:8px auto}.body pre{overflow:auto;background:var(--soft);padding:10px;border-radius:8px}
+.body blockquote{border-left:4px solid var(--honey);margin:8px 0;padding:2px 12px;color:var(--muted)}.body table{border-collapse:collapse}.body td,.body th{border:1px solid var(--line);padding:4px 8px}
+.av{width:28px;height:28px;border-radius:50%;vertical-align:middle;object-fit:cover;background:var(--soft)}
+.cm{border-left:2px solid var(--line);padding:6px 0 4px 12px;margin:8px 0 0 4px}
+textarea,input[type=text]{width:100%;font:inherit;padding:9px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--fg)}
+textarea{min-height:110px}.tags span{font-size:12.5px;border:1px solid var(--line);border-radius:99px;padding:1px 8px;margin-right:4px}
+.prof{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px;display:flex;gap:14px;align-items:center}
+.prof img{width:78px;height:78px;border-radius:50%;object-fit:cover}
+.msg{font-size:13.5px;margin-left:6px}.fee{font-size:12.5px;color:var(--muted)}
+.more{display:block;margin:14px auto}.empty{text-align:center;color:var(--muted);padding:40px 0}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:9;max-width:90%}
+footer{max-width:1000px;margin:20px auto;padding:14px;color:var(--muted);font-size:13.5px;border-top:1px solid var(--line)}
+@media (max-width:600px){.card .th{flex-basis:90px;height:70px}.post{padding:14px}.post h1{font-size:22px}}
+</style></head><body>
+<header><div class="bar">
+<a class="logo" href="#/">🐝 Bee<span>Blurt</span></a>
+<nav id="nav"><a href="#/trending">Trending</a><a href="#/hot">Hot</a><a href="#/created">New</a><a href="#/communities">Communities</a></nav>
+<span class="sp"></span><span id="who"></span></div></header>
+<main id="app"><p class="empty">Bzzz… loading 🐝</p></main>
+<footer>🐝 <b>BeeBlurt</b> is a light, open source front-end for <a href="https://blurt.blog">Blurt</a>, made by the <a href="#/@blurtbee">@blurtbee</a> hive (a Blurt witness: <a href="#" id="wvote">vote for it</a> 🗳️).
+Keys never leave your <a href="https://github.com/alexpmorris/whalevault" target="_blank" rel="noopener">WhaleVault</a>. Open source (MIT) and AI-generated with Claude, reviewed by a human.
+Every action on Blurt costs a small BLURT fee: BeeBlurt shows it before you send.</footer>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<script>
+"use strict";
+// ---------- chain ----------
+const NODES = ["https://rpc.blurt.blog", "https://blurt-rpc.saboin.com", "https://rpc.beblurt.com", "https://rpc.blurt.world"];
+let NODE = NODES[0];
+async function rpc(method, params) {
+  for (const n of [NODE, ...NODES.filter(x => x !== NODE)]) {
+    try {
+      const r = await fetch(n, {method: "POST", body: JSON.stringify({jsonrpc: "2.0", method, params, id: 1})}).then(r => r.json());
+      if (r.result !== undefined) { NODE = n; return r.result; }
+      if (r.error) throw new Error(r.error.message);
+    } catch (e) { console.warn(n, method, e.message); }
+  }
+  throw new Error("no Blurt node answered");
+}
+let FEE = {flat: 0.05, kb: 0.2};
+rpc("condenser_api.get_chain_properties", []).then(p => { FEE = {flat: parseFloat(p.operation_flat_fee), kb: parseFloat(p.bandwidth_kbytes_fee)}; }).catch(() => {});
+const fee = (ops) => { const bytes = 300 + JSON.stringify(ops).length; return (FEE.flat * ops.length + bytes / 1024 * FEE.kb).toFixed(3); };
+
+// ---------- WhaleVault (Blurt accounts are "blt:name") ----------
+const APP = "beeblurt";
+let USER = null; try { USER = localStorage.getItem("bb_user"); } catch (e) {}
+const wv = () => window.whalevault;
+function toast(t, ms) { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), ms || 4500); }
+function signBuffer(account, message, key, reason) {
+  return new Promise(res => wv().requestSignBuffer(APP, "blt:" + account, message, key, reason, "hex", res));
+}
+async function broadcast(ops, key) {
+  if (!USER) { toast("Log in with WhaleVault first 🐝"); return false; }
+  if (!wv()) { toast("WhaleVault is not installed in this browser"); return false; }
+  const r = await signBuffer(USER, {url: NODE, operations: ops}, key || "Posting", "beeblurt");
+  if (r && r.success) return true;
+  toast("Not sent: " + ((r && (r.message && r.message.message || r.message)) || "cancelled")); return false;
+}
+async function login() {
+  if (!wv()) { toast("Install the WhaleVault extension (Chrome/Firefox) and add your Blurt account to it.", 7000); return; }
+  const name = (prompt("Your Blurt username:") || "").trim().replace(/^@/, "").toLowerCase(); if (!name) return;
+  const r = await signBuffer(name, "Log in to BeeBlurt " + new Date().toISOString(), "Posting", "Login");
+  if (r && r.success) { USER = name; try { localStorage.setItem("bb_user", name); } catch (e) {} drawWho(); route(); }
+  else toast("Login cancelled or failed");
+}
+function logout() { USER = null; try { localStorage.removeItem("bb_user"); } catch (e) {} drawWho(); route(); }
+function drawWho() {
+  const w = document.getElementById("who");
+  w.innerHTML = USER ? `<a href="#/@${esc(USER)}"><img class="av" src="${av(USER)}" alt=""></a> <a class="btn" href="#/submit">✍️ Write</a> <button class="btn g" id="lo">Log out</button>`
+                     : `<button class="btn" id="li">🐋 Log in with WhaleVault</button>`;
+  (document.getElementById("lo") || {}).onclick = logout; (document.getElementById("li") || {}).onclick = login;
+}
+
+// ---------- helpers ----------
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+const IMG = (u, w, h) => /^https?:\/\//.test(u || "") ? `https://images.hive.blog/${w || 640}x${h || 0}/${u}` : "";
+// avatars: a tiny honey-coloured badge with the initial (no extra downloads, so the page stays light)
+const av = a => { let h = 0; for (const ch of String(a)) h = (h * 31 + ch.charCodeAt(0)) % 360;
+  return "data:image/svg+xml," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><circle cx='20' cy='20' r='20' fill='hsl(${h},70%,55%)'/><text x='20' y='27' font-size='20' text-anchor='middle' fill='white' font-family='sans-serif'>${String(a)[0].toUpperCase()}</text></svg>`); };
+function ago(t) { const s = (Date.now() - new Date(t + "Z")) / 1000; if (s < 3600) return Math.max(1, Math.round(s / 60)) + " min ago";
+  if (s < 86400) return Math.round(s / 3600) + " h ago"; return Math.round(s / 86400) + " d ago"; }
+const meta = p => { try { return typeof p.json_metadata === "string" ? JSON.parse(p.json_metadata || "{}") : (p.json_metadata || {}); } catch (e) { return {}; } };
+const thumb = p => { const m = meta(p); const i = (m.image || [])[0] || ((p.body || "").match(/https?:\/\/\S+?\.(?:jpe?g|png|gif|webp)/i) || [])[0]; return i ? IMG(i, 260, 180) : ""; };
+const plain = b => (b || "").replace(/!\[[^\]]*\]\([^)]*\)/g, "").replace(/<[^>]+>/g, " ").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/https?:\/\/\S+/g, "").replace(/[#*_>`~|-]/g, "").replace(/\s+/g, " ").trim().slice(0, 220);
+const payout = p => (p.payout != null ? p.payout : parseFloat(p.pending_payout_value || p.total_payout_value || 0)).toFixed(3) + " BLURT";
+function md(body) {
+  let b = (body || "").replace(/(^|\s)(https?:\/\/\S+?\.(?:jpe?g|png|gif|webp))(?=\s|$)/gi, "$1![]($2)");
+  let h = DOMPurify.sanitize(marked.parse(b, {breaks: true}), {FORBID_TAGS: ["style", "form", "input"], FORBID_ATTR: ["style"]});
+  const d = document.createElement("div"); d.innerHTML = h;
+  d.querySelectorAll("img").forEach(i => { const s = i.getAttribute("src"); if (s && !s.includes("images.hive.blog")) i.src = IMG(s, 800); i.loading = "lazy"; });
+  d.querySelectorAll("a").forEach(a => { const href = a.getAttribute("href") || ""; const m = href.match(/^https?:\/\/(?:blurt\.blog|beblurt\.com|blurt\.one)\/(?:[^/]+\/)?(@[a-z0-9.-]+(?:\/[a-z0-9-]+)?)/i);
+    if (m) a.href = "#/" + m[1]; else if (/^https?:/.test(href)) { a.target = "_blank"; a.rel = "noopener nofollow"; } });
+  return d.innerHTML;
+}
+const perm = t => ((t || "post").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "post") + "-" + Date.now().toString(36);
+
+// ---------- views ----------
+const app = document.getElementById("app");
+let FEED = null;
+function card(p) {
+  const t = thumb(p), url = `#/@${esc(p.author)}/${esc(p.permlink)}`;
+  return `<div class="card">${t ? `<a href="${url}"><img class="th" src="${t}" alt="" loading="lazy"></a>` : ""}<div style="min-width:0">
+   <h2><a href="${url}">${esc(p.title)}</a></h2>
+   <div class="meta"><a href="#/@${esc(p.author)}">@${esc(p.author)}</a> · ${p.community_title ? `<a href="#/c/${esc(p.community)}">${esc(p.community_title)}</a> · ` : ""}${ago(p.created)} · 💰 ${payout(p)} · 👍 ${(p.stats && p.stats.total_votes) || (p.active_votes || []).length} · 💬 ${p.children || 0}</div>
+   <p class="sum">${esc(plain(p.body))}</p></div></div>`;
+}
+async function feed(sort, tag, title) {
+  app.innerHTML = `<p class="empty">Bzzz… fetching the ${esc(title || sort)} flowers 🌼</p>`;
+  FEED = {sort, tag, posts: [], done: false};
+  await moreFeed(true);
+}
+async function moreFeed(first) {
+  const last = FEED.posts[FEED.posts.length - 1];
+  const params = {sort: FEED.sort, tag: FEED.tag || "", limit: 20, observer: USER || ""};
+  if (last) { params.start_author = last.author; params.start_permlink = last.permlink; }
+  let got;
+  try { got = FEED.account ? await rpc("bridge.get_account_posts", {sort: FEED.sort, account: FEED.account, limit: 20, ...(last ? {start_author: last.author, start_permlink: last.permlink} : {})})
+                         : await rpc("bridge.get_ranked_posts", params); }
+  catch (e) { app.innerHTML = `<p class="empty">No Blurt node answered. Try again in a minute.</p>`; return; }
+  const fresh = got.filter(p => !last || p.author + p.permlink !== last.author + last.permlink);
+  FEED.posts.push(...fresh); if (fresh.length < 19) FEED.done = true;
+  const html = (first && FEED.head ? FEED.head : "") + fresh.map(card).join("");
+  if (first) app.innerHTML = html || `<p class="empty">Nothing here yet 🌱</p>`; else document.getElementById("mb").insertAdjacentHTML("beforebegin", html);
+  const mb = document.getElementById("mb"); if (mb) mb.remove();
+  if (!FEED.done) { app.insertAdjacentHTML("beforeend", `<button class="btn g more" id="mb">Load more 🐝</button>`); document.getElementById("mb").onclick = () => moreFeed(false); }
+}
+async function profile(acc, sort) {
+  app.innerHTML = `<p class="empty">Bzzz… visiting @${esc(acc)} 🐝</p>`;
+  let pr; try { pr = await rpc("bridge.get_profile", {account: acc, observer: USER || ""}); } catch (e) { app.innerHTML = `<p class="empty">Account not found</p>`; return; }
+  const m = (pr.metadata && pr.metadata.profile) || {}, st = pr.stats || {};
+  FEED = {sort: sort || "posts", account: acc, posts: [], done: false,
+    head: `<div class="prof"><img src="${IMG(m.profile_image, 160, 160) || av(acc)}" alt=""><div style="flex:1"><h2 style="margin:0">${esc(m.name || acc)} <span class="meta">@${esc(acc)}</span></h2>
+      <div class="meta">${esc(m.about || "")}</div><div class="meta">👥 ${st.followers || 0} followers · ${st.following || 0} following · ✍️ ${pr.post_count || 0} posts · since ${esc((pr.created || "").slice(0, 10))}</div>
+      <div class="row"><a class="btn g" href="#/@${esc(acc)}">Posts</a> <a class="btn g" href="#/@${esc(acc)}/blog">Blog + reblurts</a> <a class="btn g" href="#/@${esc(acc)}/comments">Comments</a>
+      ${USER && USER !== acc ? `<button class="btn" id="fo">${pr.context && pr.context.followed ? "Unfollow" : "Follow"}</button><span class="fee" id="fof"></span>` : ""}</div></div></div>`};
+  await moreFeed(true);
+  const fo = document.getElementById("fo"); if (fo) { const followed = pr.context && pr.context.followed;
+    const ops = [["custom_json", {required_auths: [], required_posting_auths: [USER], id: "follow", json: JSON.stringify(["follow", {follower: USER, following: acc, what: followed ? [] : ["blog"]}])}]];
+    document.getElementById("fof").textContent = " fee ≈ " + fee(ops) + " BLURT"; fo.onclick = async () => { if (await broadcast(ops)) { toast(followed ? "Unfollowed" : "Following! 🐝"); setTimeout(() => profile(acc, sort), 3000); } }; }
+}
+function commentNode(c, all) {
+  const kids = (c.replies || []).map(k => all[k]).filter(Boolean).sort((a, b) => (b.payout || 0) - (a.payout || 0));
+  return `<div class="cm" id="c-${esc(c.author)}-${esc(c.permlink)}"><div class="meta"><img class="av" src="${av(c.author)}" alt="" loading="lazy"> <a href="#/@${esc(c.author)}"><b>@${esc(c.author)}</b></a> · ${ago(c.created)} · 💰 ${payout(c)}</div>
+   <div class="body">${md(c.body)}</div>${actions(c)}${kids.map(k => commentNode(k, all)).join("")}</div>`;
+}
+function actions(p) {
+  const voted = USER && (p.active_votes || []).some(v => v.voter === USER);
+  const k = esc(p.author + "/" + p.permlink);
+  return `<div class="row" data-k="${k}">${voted ? `<span class="meta">✅ voted</span>` : `<button class="btn g vb">👍 Vote</button>`}
+   <button class="btn g rb">💬 Reply</button><span class="msg"></span></div><div class="slot"></div>`;
+}
+async function postView(author, permlink) {
+  app.innerHTML = `<p class="empty">Bzzz… opening the flower 🌸</p>`;
+  let all; try { all = await rpc("bridge.get_discussion", {author, permlink, observer: USER || ""}); } catch (e) { app.innerHTML = `<p class="empty">Post not found</p>`; return; }
+  const p = all[author + "/" + permlink]; if (!p) { app.innerHTML = `<p class="empty">Post not found</p>`; return; }
+  const tags = (meta(p).tags || []).slice(0, 8);
+  const kids = (p.replies || []).map(k => all[k]).filter(Boolean);
+  app.innerHTML = `<article class="post">${p.depth ? `<p class="meta">💬 This is a comment · <a href="#/@${esc(p.parent_author)}/${esc(p.parent_permlink)}">go to the parent</a></p>` : ""}
+   <h1>${esc(p.title || "RE: " + (p.root_title || ""))}</h1>
+   <div class="meta"><img class="av" src="${av(p.author)}" alt=""> <a href="#/@${esc(p.author)}"><b>@${esc(p.author)}</b></a> · ${p.community_title ? `<a href="#/c/${esc(p.community)}">${esc(p.community_title)}</a> · ` : ""}${ago(p.created)}</div>
+   <div class="body">${md(p.body)}</div>
+   <div class="tags" style="margin:10px 0">${tags.map(t => `<span>#${esc(t)}</span>`).join("")}</div>
+   <div class="meta">💰 ${payout(p)}${p.is_paidout ? " (paid)" : ` · payout ${esc((p.payout_at || "").slice(0, 16).replace("T", " "))} UTC`} · 👍 ${(p.active_votes || []).length} votes · 💬 ${p.children || 0}</div>
+   ${actions(p)}</article><h3>💬 ${p.children || 0} comments</h3><div id="cms">${kids.map(c => commentNode(c, all)).join("") || `<p class="meta">No comments yet: be the first bee to buzz! 🐝</p>`}</div>`;
+}
+document.addEventListener("click", async ev => {
+  const b = ev.target.closest(".vb, .rb"); if (!b) return;
+  const row = b.closest(".row"), [author, permlink] = row.dataset.k.split("/"), slot = row.nextElementSibling, msg = row.querySelector(".msg");
+  if (!USER) { toast("Log in with WhaleVault first 🐝"); return; }
+  if (b.classList.contains("vb")) {
+    slot.innerHTML = `<div class="row"><input type="range" min="1" max="100" value="100" class="w"> <b class="wv">100%</b> <button class="btn ok">Send vote</button> <span class="fee">fee ≈ ${fee([["vote", {voter: USER, author, permlink, weight: 10000}]])} BLURT</span></div>`;
+    const w = slot.querySelector(".w"); w.oninput = () => slot.querySelector(".wv").textContent = w.value + "%";
+    slot.querySelector(".ok").onclick = async () => { if (await broadcast([["vote", {voter: USER, author, permlink, weight: +w.value * 100}]])) { msg.textContent = "✅ voted"; slot.innerHTML = ""; b.remove(); } };
+  } else {
+    slot.innerHTML = `<div style="margin-top:8px"><textarea placeholder="Write your reply to @${esc(author)}…"></textarea><div class="row"><button class="btn ok">Send reply</button> <span class="fee"></span></div></div>`;
+    const ta = slot.querySelector("textarea"), fe = slot.querySelector(".fee");
+    const op = () => ["comment", {parent_author: author, parent_permlink: permlink, author: USER, permlink: ("re-" + author + "-" + Date.now().toString(36)).replace(/[^a-z0-9-]/g, ""), title: "", body: ta.value, json_metadata: JSON.stringify({app: "beeblurt/0.1"})}];
+    ta.oninput = () => fe.textContent = "fee ≈ " + fee([op()]) + " BLURT"; ta.oninput(); ta.focus();
+    slot.querySelector(".ok").onclick = async () => { if (!ta.value.trim()) return; if (await broadcast([op()])) { toast("Reply sent! 🐝"); slot.innerHTML = ""; setTimeout(route, 3500); } };
+  }
+});
+async function communities() {
+  app.innerHTML = `<p class="empty">Bzzz… counting the communities 🏘️</p>`;
+  let cs; try { cs = await rpc("bridge.list_communities", {limit: 100, sort: "rank"}); } catch (e) { app.innerHTML = `<p class="empty">No Blurt node answered.</p>`; return; }
+  app.innerHTML = `<h2>🏘️ Communities</h2>` + cs.map(c => `<div class="card"><div><h2><a href="#/c/${esc(c.name)}">${esc(c.title)}</a></h2>
+    <div class="meta">${esc(c.about || "")}</div><div class="meta">👥 ${c.subscribers || 0} members · ✍️ ${c.num_authors || 0} active authors</div></div></div>`).join("");
+}
+function submit() {
+  if (!USER) { app.innerHTML = `<p class="empty">Log in with WhaleVault to write a post 🐝</p>`; return; }
+  app.innerHTML = `<div class="post"><h2 style="margin-top:0">✍️ New post</h2>
+   <input type="text" id="t" placeholder="Title"><br><br><textarea id="b" style="min-height:260px" placeholder="Write in Markdown… (images: paste a link ending in .jpg/.png)"></textarea><br><br>
+   <input type="text" id="g" placeholder="Community (e.g. blurt-123456) or first tag"><br><br><input type="text" id="tg" placeholder="Tags, separated by spaces (max 8)">
+   <div class="row"><button class="btn" id="go">Publish</button> <button class="btn g" id="pv">Preview</button> <span class="fee" id="fe"></span></div><div id="pre" class="body" style="margin-top:14px"></div></div>`;
+  const $ = id => document.getElementById(id);
+  try { $("b").value = localStorage.getItem("bb_draft") || ""; } catch (e) {}
+  const build = () => { const tags = $("tg").value.toLowerCase().split(/[\s,#]+/).filter(Boolean).slice(0, 8), cat = ($("g").value.trim().toLowerCase() || tags[0] || "blurt");
+    return [["comment", {parent_author: "", parent_permlink: cat, author: USER, permlink: perm($("t").value), title: $("t").value.trim(), body: $("b").value,
+      json_metadata: JSON.stringify({app: "beeblurt/0.1", format: "markdown", tags: [cat, ...tags.filter(t => t !== cat)].slice(0, 8)})}]]; };
+  const upd = () => { $("fe").textContent = "fee ≈ " + fee(build()) + " BLURT"; try { localStorage.setItem("bb_draft", $("b").value); } catch (e) {} };
+  ["t", "b", "g", "tg"].forEach(i => $(i).oninput = upd); upd();
+  $("pv").onclick = () => $("pre").innerHTML = md($("b").value);
+  $("go").onclick = async () => { if (!$("t").value.trim() || !$("b").value.trim()) { toast("Title and text, please 🐝"); return; }
+    const ops = build(); if (await broadcast(ops)) { try { localStorage.removeItem("bb_draft"); } catch (e) {} toast("Published! 🎉"); setTimeout(() => location.hash = `#/@${USER}/${ops[0][1].permlink}`, 3500); } };
+}
+document.getElementById("wvote").onclick = async ev => { ev.preventDefault();
+  if (!USER) { toast("Log in with WhaleVault first 🐝"); return; }
+  if (confirm("Vote @blurtbee as a Blurt witness? (needs your ACTIVE key in WhaleVault)"))
+    if (await broadcast([["account_witness_vote", {account: USER, witness: "blurtbee", approve: true}]], "Active")) toast("Thank you! 🐝💛"); };
+
+// ---------- router ----------
+function route() {
+  const h = decodeURIComponent(location.hash.slice(1) || "/trending"); const parts = h.split("/").filter(Boolean);
+  document.querySelectorAll("#nav a").forEach(a => a.classList.toggle("on", "#" + h === a.getAttribute("href")));
+  window.scrollTo(0, 0);
+  if (!parts.length || ["trending", "hot", "created"].includes(parts[0])) return feed(parts[0] || "trending", parts[1] || "", parts[0]);
+  if (parts[0] === "communities") return communities();
+  if (parts[0] === "submit") return submit();
+  if (parts[0] === "c") return feed("created", parts[1], parts[1]);
+  if (parts[0][0] === "@") { const a = parts[0].slice(1).toLowerCase();
+    if (!parts[1]) return profile(a, "posts");
+    if (["blog", "comments", "replies"].includes(parts[1])) return profile(a, parts[1]);
+    return postView(a, parts[1]); }
+  app.innerHTML = `<p class="empty">Page not found 🐝</p>`;
+}
+window.addEventListener("hashchange", route);
+drawWho(); route();
+</script></body></html>
